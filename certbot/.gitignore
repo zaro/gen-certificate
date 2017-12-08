@@ -1,0 +1,8 @@
+accounts/
+archive/
+csr/  
+keys/  
+live/  
+renewal/
+*.log
+*.log.*

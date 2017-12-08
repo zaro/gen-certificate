@@ -1,0 +1,4 @@
+certbot-generated/
+*.retry
+*.zip
+.DS_Store

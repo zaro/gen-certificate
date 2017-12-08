@@ -1,0 +1,39 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Install apt-transport-https
+      with_items:
+        - apt-transport-https
+      apt: name={{item}}
+
+    - name: Add certbot PPA
+      apt_repository:
+        repo: 'ppa:certbot/certbot'
+
+    - name: Install certbot
+      with_items:
+        - certbot
+      apt: name={{item}} allow_unauthenticated=yes
+
+    - name: Copy certs
+      synchronize:
+        recursive: yes
+        src: certbot/
+        dest: /root/certbot
+
+    - name: Generate certificate
+      shell: certbot -n -c certbox.conf --agree-tos --keep -m {{ lets_encrypt_email }} certonly -d {{ item }}
+      args:
+        chdir: /root/certbot
+      with_items:
+        - "{{ domains }}"
+      become: yes
+
+    - name: Copy certs locally
+      synchronize:
+        recursive: yes
+        mode: pull
+        src: /root/certbot
+        dest: certbot-generated
